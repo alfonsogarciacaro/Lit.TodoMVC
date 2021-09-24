@@ -3,9 +3,9 @@ module TodoTest
 open Elmish
 open Expect
 open Expect.Dom
+open Expect.Elmish
 open WebTestRunner
-open Lit.TodoMVC.Entry
-open TestUtil
+open Lit.TodoMVC.App
 
 describe "Todo" <| fun () ->
     it "New todo" <| fun () -> promise {
@@ -23,6 +23,6 @@ describe "Todo" <| fun () ->
         let newTodo = model.Todos |> List.find (fun t -> t.Description = "Todo test")
         newTodo |> Expect.isFalse "new todo complete" (fun t -> t.Completed)
 
-        // do! elementUpdated el
-        // do! el |> Expect.matchHtmlSnapshot "after new todo"
+        do! elementUpdated el
+        do! el |> Expect.matchHtmlSnapshot "after new todo"
     }

@@ -1,4 +1,4 @@
-module Lit.TodoMVC.Entry
+module Lit.TodoMVC.App
 
 open Elmish
 open Lit

@@ -2,9 +2,10 @@
     "private": true,
     "scripts": {
         "install": "dotnet tool restore",
-        "start": "dotnet fable watch src -o out --runFast vite",
-        "test": "dotnet fable test --define TEST --run web-test-runner test/**/*Test.fs.js --node-resolve",
-        "test:watch": "dotnet fable watch test --define TEST --run web-test-runner test/**/*Test.fs.js --node-resolve --watch"
+        "build": "dotnet fable src -o build/client --run vite build",
+        "start": "dotnet fable watch src -o build/client --runFast vite --open",
+        "test": "dotnet fable test -o build/test --define TEST --run web-test-runner build/test/*Test.js --node-resolve",
+        "test:watch": "dotnet fable watch test -o build/test --define TEST --run web-test-runner build/test/*Test.js --node-resolve --watch"
     },
     "dependencies": {
         "lit": "^2.0.0"

@@ -3,13 +3,12 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="TestUtil.fs" />
     <Compile Include="TodoTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\Lit.TodoMVC.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fable.Lit.Test" Version="1.0.0-rc-002" />
+    <PackageReference Include="Fable.Lit.Test" Version="1.0.0-rc-004" />
   </ItemGroup>
 </Project>

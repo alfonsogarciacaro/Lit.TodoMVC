@@ -5,10 +5,10 @@
   <ItemGroup>
     <Compile Include="Types.fs" />
     <Compile Include="Components.fs" />
-    <Compile Include="Entry.fs" />
+    <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fable.Lit" Version="1.0.0-rc-003" />
+    <PackageReference Include="Fable.Lit" Version="1.0.0-rc-004" />
     <PackageReference Include="Fable.Lit.Elmish" Version="1.0.0-rc-002" />
   </ItemGroup>
 </Project>

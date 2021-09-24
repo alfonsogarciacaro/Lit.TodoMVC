@@ -1,5 +1,6 @@
-*.fs.js
-out/
+build/client/*
+build/test/*
+!build/test/__snapshots__
 dist/
 
 ## Ignore Visual Studio temporary files, build results, and
