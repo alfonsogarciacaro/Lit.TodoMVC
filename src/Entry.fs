@@ -1,6 +1,5 @@
 module Lit.TodoMVC.Entry
 
-open System
 open Elmish
 open Lit
 open Components
@@ -45,9 +44,11 @@ let view model dispatch =
       </div>
     """
 
+#if !TEST
 open Lit.Elmish
 open Lit.Elmish.HMR
 
 Program.mkProgram init update view
 |> Program.withLit "app-container"
 |> Program.run
+#endif

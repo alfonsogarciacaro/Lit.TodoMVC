@@ -1,26 +1,28 @@
 module TodoTest
 
 open Elmish
-open Lit
 open Expect
 open Expect.Dom
 open WebTestRunner
-
-[<HookComponent>]
-let Counter () =
-    let value, setValue = Hook.useState 5
-
-    html
-        $"""
-      <div>
-        <p>Value: {value}</p>
-        <button @click={Ev(fun _ -> value + 1 |> setValue)}>Increment</button>
-        <button @click={Ev(fun _ -> value - 1 |> setValue)}>Decrement</button>
-      </div>
-    """
+open Lit.TodoMVC.Entry
+open TestUtil
 
 describe "Todo" <| fun () ->
-    it "counter renders" <| fun () -> promise {
-        use! el = Counter() |> render
-        return! el.El |> Expect.matchHtmlSnapshot "counter"
+    it "New todo" <| fun () -> promise {
+        let! el, obs =
+            Program.mkProgram init update view
+            |> Program.runTest
+
+        let el = el.El
+        // do! el |> Expect.matchHtmlSnapshot "before new todo"
+
+        el.getTextInput("New todo description").value <- "Todo test"
+        el.getButton("Add new todo").click()
+
+        let! model = obs.Await()
+        let newTodo = model.Todos |> List.find (fun t -> t.Description = "Todo test")
+        newTodo |> Expect.isFalse "new todo complete" (fun t -> t.Completed)
+
+        // do! elementUpdated el
+        // do! el |> Expect.matchHtmlSnapshot "after new todo"
     }
