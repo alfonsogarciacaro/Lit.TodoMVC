@@ -1,0 +1,16 @@
+{
+    "private": true,
+    "scripts": {
+        "install": "dotnet tool restore",
+        "start": "dotnet fable watch src -o out --runFast vite",
+        "test": "dotnet fable test --run web-test-runner test/**/*Test.fs.js --node-resolve",
+        "test:watch": "dotnet fable watch test --run web-test-runner test/**/*Test.fs.js --node-resolve --watch"
+    },
+    "dependencies": {
+        "lit": "^2.0.0"
+    },
+    "devDependencies": {
+        "@web/test-runner": "^0.13.16",
+        "vite": "^2.5.4"
+    }
+}
