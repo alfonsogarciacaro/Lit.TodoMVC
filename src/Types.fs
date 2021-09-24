@@ -6,17 +6,18 @@ type Todo =
     { Id: Guid
       Description: string
       Completed: bool }
-
-type Edit =
-    | NewTodo of description: string
-    | EditTodo of Todo
+    static member New(description: string) =
+        { Id = Guid.NewGuid()
+          Description = description
+          Completed = false }
 
 type State =
     { Todos: Todo list
-      Edit: Edit option }
+      Edit: Todo option }
 
 type Msg =
+    | AddNewTodo of description: string
     | DeleteTodo of Guid
     | ToggleCompleted of Guid
-    | StartEdit of Edit
-    | FinishEdit of Edit option
+    | StartEdit of Todo
+    | FinishEdit of Todo option
