@@ -3,7 +3,21 @@ module Lit.TodoMVC.Components
 open Browser.Types
 open Lit
 
-let private hmr = HMR.createToken()
+module private Util =
+    let hmr = HMR.createToken()
+
+    let onEnterOrEscape onEnter onEscape (ev: Event) =
+        let ev = ev :?> KeyboardEvent
+        match ev.key with
+        | "Enter" -> onEnter ev
+        | "Escape" -> onEscape ev
+        | _ -> ()
+
+    type Option<'T> with
+        member this.Iter(f) =
+            Option.iter f this
+
+open Util
 
 [<HookComponent>]
 let NewTodoEl dispatch =
@@ -26,10 +40,7 @@ let NewTodoEl dispatch =
                     type="text"
                     class="input is-medium"
                     aria-label="New todo description"
-                    @keyup={Ev(fun ev ->
-                        let key = (ev :?> KeyboardEvent).key
-                        if key = "Enter" then
-                            addNewTodo ev)} >
+                    @keyup={Ev(onEnterOrEscape addNewTodo ignore)}>
             </div>
             <div class="control">
                 <button class="button is-primary is-medium" aria-label="Add new todo"
@@ -43,33 +54,64 @@ let NewTodoEl dispatch =
 [<HookComponent>]
 let TodoEl dispatch (edit: Todo option) (todo: Todo) =
     Hook.useHmr(hmr)
+
+    let isEditing =
+        match edit with
+        | Some edit -> edit.Id = todo.Id
+        | None -> false
+
+    let hasFocus = Hook.useRef(false)
     let inputRef = Hook.useRef<HTMLInputElement>()
-    let style = inline_css """.{
+
+    Hook.useEffectOnChange(isEditing, function
+        | true when not hasFocus.Value ->
+            inputRef.Value.Iter(fun i -> i.focus())
+        | _ -> ())
+
+    let transition =
+        Hook.useTransition(
+            ms = 500,
+            cssBefore = "opacity: 0; transform: scale(2);",
+            cssAfter = "opacity: 0; transform: scale(0.1);",
+            onComplete = fun isIn -> if not isIn then DeleteTodo todo.Id |> dispatch
+        )
+
+    let style = transition.css + inline_css """.{
         border: 2px solid lightgray;
         border-radius: 10px;
         margin: 5px 0;
     }"""
-    match edit with
-    | Some edit when edit.Id = todo.Id ->
+
+    if isEditing then
+        let applyEdit _ =
+            inputRef.Value.Iter(fun input ->
+                { todo with Description = input.value.Trim() }
+                |> Some
+                |> FinishEdit
+                |> dispatch)
+
+        let cancelEdit _ =
+            FinishEdit None |> dispatch
+
         html $"""
             <div class="columns" style={style}>
                 <div class="column is-10">
-                    <input {Lit.ref inputRef} type="text" class="input" aria-label="Edit todo" value={todo.Description}>
+                    <input {Lit.ref inputRef}
+                        type="text"
+                        class="input"
+                        aria-label="Edit todo"
+                        value={todo.Description}
+                        @keyup={Ev(onEnterOrEscape applyEdit cancelEdit)}
+                        @blur={Ev cancelEdit}>
                 </div>
                 <div class="column is-2">
                     <button class="button is-primary" aria-label="Save edit"
-                        @click={Ev(fun _ ->
-                            inputRef.Value
-                            |> Option.iter (fun input ->
-                                { todo with Description = input.value.Trim() }
-                                |> Some
-                                |> FinishEdit
-                                |> dispatch))}>
+                        @click={Ev applyEdit}>
                         <i class="fa fa-save"></i>
                     </button>
                 </div>
             </div>"""
-    | _ ->
+    else
         html $"""
             <div class="columns" style={style}>
                 <div class="column is-9">
@@ -81,7 +123,8 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
                 </div>
                 <div class="column is-3">
                     <!-- TODO: Provide aria besides color to indicate if item is complete or not -->
-                    <button class={Lit.classes ["button", true; "is-success", todo.Completed]} aria-label="Check"
+                    <button class={Lit.classes ["button", true; "is-success", todo.Completed]}
+                        aria-label={if todo.Completed then "Mark uncompleted" else "Mark completed"}
                         @click={Ev(fun _ -> ToggleCompleted todo.Id |> dispatch)}>
                         <i class="fa fa-check"></i>
                     </button>
@@ -90,7 +133,7 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
                         <i class="fa fa-edit"></i>
                     </button>
                     <button class="button is-danger" aria-label="Delete"
-                        @click={Ev(fun _ -> DeleteTodo todo.Id |> dispatch)}>
+                        @click={Ev(fun _ -> transition.triggerLeave())}>
                         <i class="fa fa-times"></i>
                     </button>
                 </div>

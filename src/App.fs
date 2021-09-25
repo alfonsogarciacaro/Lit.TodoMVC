@@ -12,8 +12,7 @@ let update msg model =
     match msg with
     | AddNewTodo description ->
         let todo = Todo.New(description)
-        let todos = model.Todos @ [todo]
-        { model with Todos = todos; Edit = None }, Cmd.none
+        { model with Todos = todo::model.Todos ; Edit = None }, Cmd.none
 
     | DeleteTodo guid ->
         let todos = model.Todos |> List.filter (fun t -> t.Id <> guid)
@@ -40,7 +39,10 @@ let view model dispatch =
       <div style="margin: 0 auto; max-width: 800px; padding: 20px;">
         <p class="title">Lit.TodoMVC</p>
         {NewTodoEl dispatch}
-        {model.Todos |> List.map (TodoEl dispatch model.Edit)}
+        <!-- {model.Todos |> List.map (TodoEl dispatch model.Edit)} -->
+        {model.Todos |> Lit.mapUnique
+                (fun t -> string t.Id)
+                (TodoEl dispatch model.Edit)}
       </div>
     """
 

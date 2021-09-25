@@ -3,7 +3,8 @@
     "scripts": {
         "install": "dotnet tool restore",
         "build": "dotnet fable src -o build/client --run vite build",
-        "start": "dotnet fable watch src -o build/client --runFast vite --open",
+        "start": "dotnet fable watch src -o build/client --run vite --open",
+        "start:fast": "dotnet fable watch src -o build/client --runFast vite --open",
         "test": "dotnet fable test -o build/test --define TEST --run web-test-runner build/test/*Test.js --node-resolve",
         "test:watch": "dotnet fable watch test -o build/test --define TEST --run web-test-runner build/test/*Test.js --node-resolve --watch"
     },
