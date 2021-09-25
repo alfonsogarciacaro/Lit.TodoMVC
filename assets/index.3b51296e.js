@@ -14,7 +14,7 @@ import{n as t,c as e,y as n,A as r,e as i,d as o}from"./vendor.04e87fa7.js";func
     </button>
     </div>
     </div>
-    `)})),cr=(new nr).Decorate((function(t,e,n){const r=null!=e&&e.Id===n.Id,i=rr(this).useRef((()=>!1)),o=rr(this).useRef((()=>{}));tr(rr(this),r,(t=>{let e;switch(e=t?i.contents?1:0:1,e){case 0:sr(o.contents,(t=>{t.focus()}))}}));const s=ir(rr(this),new Yn(500,"opacity: 0; transform: scale(2);",void 0,"opacity: 0; transform: scale(0.1);",(e=>{e||t(new Vt(1,n.Id))})));const u=s.css+function(t){const e=0|t.indexOf("{");if(-1===e)return t;{const n=0|e,r=0|t.lastIndexOf("}");return r>n?t.slice(n+1,r-1+1):t}}(".{\r\n        border: 2px solid lightgray;\r\n        border-radius: 10px;\r\n        margin: 5px 0;\r\n    }");if(r){const e=e=>{sr(o.contents,(e=>{t(new Vt(4,new Jt(n.Id,e.value.trim(),n.Completed)))}))},r=e=>{t(new Vt(4,void 0))};return $e(zt`
+    `)})),cr=(new nr).Decorate((function(t,e,n){const r=null!=e&&e.Id===n.Id,i=rr(this).useRef((()=>!1)),o=rr(this).useRef((()=>{}));tr(rr(this),r,(t=>{let e;switch(e=t?i.contents?1:0:1,e){case 0:sr(o.contents,(t=>{t.select()}))}}));const s=ir(rr(this),new Yn(500,"opacity: 0; transform: scale(2);",void 0,"opacity: 0; transform: scale(0.1);",(e=>{e||t(new Vt(1,n.Id))})));const u=s.css+function(t){const e=0|t.indexOf("{");if(-1===e)return t;{const n=0|e,r=0|t.lastIndexOf("}");return r>n?t.slice(n+1,r-1+1):t}}(".{\r\n        border: 2px solid lightgray;\r\n        border-radius: 10px;\r\n        margin: 5px 0;\r\n    }");if(r){const e=e=>{sr(o.contents,(e=>{t(new Vt(4,new Jt(n.Id,e.value.trim(),n.Completed)))}))},r=e=>{t(new Vt(4,void 0))};return $e(zt`
         <div class="columns" style=${u}>
         <div class="column is-10">
         <input ${Fe(o)}
