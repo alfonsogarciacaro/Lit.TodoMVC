@@ -51,6 +51,7 @@ open Lit.Elmish
 open Lit.Elmish.HMR
 
 Program.mkProgram init update view
+|> Program.withLocalStorage
 |> Program.withLit "app-container"
 |> Program.run
 #endif

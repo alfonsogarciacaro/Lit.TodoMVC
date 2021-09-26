@@ -65,7 +65,7 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
 
     Hook.useEffectOnChange(isEditing, function
         | true when not hasFocus.Value ->
-            inputRef.Value.Iter(fun i -> i.focus())
+            inputRef.Value.Iter(fun i -> i.select())
         | _ -> ())
 
     let transition =
