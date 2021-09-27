@@ -15,9 +15,8 @@ describe "Todo" <| fun () ->
             Program.mkProgram init update view
             |> Program.runTest
 
-        // Access the element from the container and do snapshot testing
+        // Access the element from the container
         let el = container.El
-        do! el |> Expect.matchHtmlSnapshot "before new todo"
 
         // We can get the form elements using the aria labels, same way as screen readers will do
         el.getTextInput("New todo description").value <- "Elmish test"
@@ -28,7 +27,7 @@ describe "Todo" <| fun () ->
         let newTodo = model.Todos |> List.find (fun t -> t.Description = "Elmish test")
         newTodo |> Expect.isFalse "new todo complete" (fun t -> t.Completed)
 
-        // Await for the element to update
+        // Await for the element to update and do a snapshot test
         do! elementUpdated el
-        do! el |> Expect.matchHtmlSnapshot "after new todo"
+        do! el |> Expect.matchHtmlSnapshot "new-todo"
     }
