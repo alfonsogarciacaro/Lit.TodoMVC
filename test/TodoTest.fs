@@ -14,7 +14,7 @@ describe "Todo" <| fun () ->
             |> Program.runTest
 
         let el = el.El
-        // do! el |> Expect.matchHtmlSnapshot "before new todo"
+        do! el |> Expect.matchHtmlSnapshot "before new todo"
 
         el.getTextInput("New todo description").value <- "Todo test"
         el.getButton("Add new todo").click()
