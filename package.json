@@ -9,6 +9,9 @@
         "publish": "npm test && npm run build -- --base=/Lit.TodoMVC/ && npx gh-pages -d dist"
     },
     "dependencies": {
+        "@lit-labs/motion": "^1.0.0",
+        "bootstrap-icons": "^1.5.0",
+        "bulma": "^0.9.3",
         "lit": "^2.0.0"
     },
     "devDependencies": {

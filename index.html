@@ -2,24 +2,17 @@
 <html lang="en">
 
 <head>
-	<title>Fable</title>
+	<title>Lit.TodoMVC</title>
 	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css" />
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-		integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
 	<link rel="shortcut icon" href="fable.ico" />
-
-	<style>
-		html, body {
-		    height: 100%;
-		}
-	</style>
 </head>
 
 <body>
-    <div id="app-container"></div>
+    <todo-app>
+        <p slot="title">Lit.TodoMVC</p>
+    </todo-app>
     <script type="module" src="./build/client/App.js"></script>
 </body>
 

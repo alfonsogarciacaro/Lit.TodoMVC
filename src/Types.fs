@@ -13,9 +13,11 @@ type Todo =
 
 type State =
     { Todos: Todo list
-      Edit: Todo option }
+      Edit: Todo option
+      Sort: bool }
 
 type Msg =
+    | ToggleSort
     | AddNewTodo of description: string
     | DeleteTodo of Guid
     | ToggleCompleted of Guid
