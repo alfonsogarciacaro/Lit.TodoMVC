@@ -7,16 +7,6 @@ open Util
 
 let private hmr = HMR.createToken()
 
-module Styles =
-    // By extracting the styles we make them reusable by other web components if needed.
-    // Note these are promises so they need to be awaited (there's also `importStyleSheetSync`).
-    let bulma = LitElement.importStyleSheet("bulma/css/bulma.min.css")
-    let bootsrapIcons = LitElement.importStyleSheet("bootstrap-icons/font/bootstrap-icons.css")
-
-    // We could use external stylesheets, but in this case is problematic because the font references won't be imported
-    // let bulma = LitElement.importExternalStyleSheet("https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css")
-    // let bootsrapIcons = LitElement.importExternalStyleSheet("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css")
-
 let init() =
     let todos = [ Todo.New("Learn F#"); Todo.New("Have fun with Lit!") ]
     { Todos = todos; Edit = None; Sort = false }, Cmd.none
@@ -50,20 +40,41 @@ let update msg model =
             if t1.Id = t2.Id then t1 else t2)
         { model with Todos = todos; Edit = None }, Cmd.none
 
+type Props = {| localStorage: Prop<bool>; model: Prop<State option> |}
+
 [<LitElement("todo-app")>]
 let TodoApp() =
-    let _ = LitElement.initAsync(fun cfg -> promise {
+    let _, props = LitElement.initAsync(fun cfg -> promise {
+// Web Test Runner cannot load CSS so skip this during tests
+#if !TEST
         let! bulma = Styles.bulma
         let! bootsrapIcons = Styles.bootsrapIcons
         cfg.styles <- [
             bulma
             bootsrapIcons
         ]
+#endif
+        cfg.props <-
+            {|
+                localStorage = Prop.Of(false, attribute="local-storage")
+                model = Prop.Of(None, attribute="")
+            |}: Props
+        return ()
     })
 
     Hook.useHmr(hmr)
-    let encode, decode = Hook.useMemo(generateThothCoders)
-    let model, dispatch = Hook.useElmishWithLocalStorage(init, update, encode, decode, "todo-app")
+
+    // Hooks should be called consistently, so we only take the initial value of local-storage attribute into account
+    let localStorage = Hook.useMemo(fun () -> props.localStorage.Value)
+    let model, dispatch =
+        if localStorage then
+            let encode, decode = Hook.useMemo(generateThothCoders)
+            Hook.useElmishWithLocalStorage(init, update, encode, decode, "todo-app")
+        else
+            Hook.useElmish(init, update)
+
+    // Make model accessible to tests
+    props.model.Value <- Some model
 
     let todos =
         if not model.Sort then model.Todos
@@ -89,3 +100,6 @@ let TodoApp() =
             (TodoEl dispatch model.Edit)}
       </div>
     """
+
+// Dummy trigger so the module can be imported and the component registered
+let register() = ()

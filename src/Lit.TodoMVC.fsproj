@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Styles.fs" />
     <Compile Include="Util.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Components.fs" />

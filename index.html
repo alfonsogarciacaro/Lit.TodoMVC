@@ -7,10 +7,15 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<link rel="shortcut icon" href="fable.ico" />
+
+    <!-- Used to hide slots until the web component is defined and prevent a flash of unstyled content -->
+    <style>
+        *:not(:defined) { display:none }
+     </style>
 </head>
 
 <body>
-    <todo-app>
+    <todo-app local-storage>
         <p slot="title">Lit.TodoMVC</p>
     </todo-app>
     <script type="module" src="./build/client/App.js"></script>
