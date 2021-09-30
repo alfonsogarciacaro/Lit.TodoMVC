@@ -34,9 +34,11 @@ module Program =
         Program.map (mapInit decode storageKey) (mapUpdate encode storageKey) id id id program
 
 type Lit.Hook with
-    static member inline useElmishWithLocalStorage(init, update, encode, decode, storageKey) =
-        let init = mapInit decode storageKey init
-        let update = mapUpdate encode storageKey update
+    static member inline useElmishWithLocalStorage(init, update, encode, decode, storageKey, ?disable) =
+        let disable = defaultArg disable false
+        let init, update =
+            if disable then init, update
+            else mapInit decode storageKey init, mapUpdate encode storageKey update
         Lit.Hook.getContext().useElmish(init, update)
 
 let inline generateThothCoders<'T>() =

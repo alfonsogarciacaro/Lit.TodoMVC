@@ -2,7 +2,8 @@
 export const snapshots = {};
 
 snapshots["new-todo"] = 
-`<div style="margin: 0 auto; max-width: 800px; padding: 20px;">
+`<todo-app>
+    <div style="margin: 0 auto; max-width: 800px; padding: 20px;">
     <div class="title">
     <slot name="title"></slot>
     </div>
@@ -86,6 +87,7 @@ snapshots["new-todo"] =
         </button>
         </div>
         </div>
-    </div>`;
+    </div>
+    </todo-app>`;
 /* end snapshot new-todo */
 
