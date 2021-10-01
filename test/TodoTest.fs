@@ -1,33 +1,43 @@
 module TodoTest
 
-open Elmish
 open Expect
 open Expect.Dom
 open Expect.Elmish
 open WebTestRunner
-open Lit.TodoMVC.App
+open Lit.TodoMVC
+
+App.register()
 
 describe "Todo" <| fun () ->
-    it "New todo" <| fun () -> promise {
-        // Initialize the Elmish app with Program.runTest, this will return a container
-        // that's also an observable reporting model updates
-        use! container =
-            Program.mkProgram init update view
+    // Test the Elmish app without UI
+    it "TodoApp Elmish" <| fun () -> promise {
+        // Start the Elmish app without UI and get a handler
+        // to access the model and dispatch messages
+        use app =
+            Program.mkHidden App.init App.update
             |> Program.runTest
 
-        // Access the element from the container
+        AddNewTodo "Elmish test" |> app.Dispatch
+        app.Model.Todos
+        |> Expect.find "new todo" (fun t -> t.Description = "Elmish test")
+        |> Expect.isFalse "completed" (fun t -> t.Completed)
+    }
+
+    // Test the UI (running Elmish underneath)
+    it "TodoApp UI" <| fun () -> promise {
+        use! container = render_html $"<todo-app></todo-app>"
+
         let el = container.El
+        let newTodo = "Elmish test"
+        el |> Expect.error "new todo before adding" (fun el -> el.getByText(newTodo))
 
         // We can get the form elements using the aria labels, same way as screen readers will do
-        el.getTextInput("New todo description").value <- "Elmish test"
+        el.getTextInput("New todo description").value <- newTodo
         el.getButton("Add new todo").click()
 
-        // Get the updated model and confirm it contains the new todo uncompleted
-        let! model = container.Await()
-        let newTodo = model.Todos |> List.find (fun t -> t.Description = "Elmish test")
-        newTodo |> Expect.isFalse "new todo complete" (fun t -> t.Completed)
-
-        // Await for the element to update and do a snapshot test
+        // Await for the element to update
         do! elementUpdated el
+
+        el |> Expect.success "new todo found" (fun el -> el.getByText(newTodo))
         do! el |> Expect.matchHtmlSnapshot "new-todo"
     }

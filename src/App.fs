@@ -3,13 +3,19 @@ module Lit.TodoMVC.App
 open Elmish
 open Lit
 open Components
+open Util
+
+let private hmr = HMR.createToken()
 
 let init() =
     let todos = [ Todo.New("Learn F#"); Todo.New("Have fun with Lit!") ]
-    { Todos = todos; Edit = None }, Cmd.none
+    { Todos = todos; Edit = None; Sort = false }, Cmd.none
 
 let update msg model =
     match msg with
+    | ToggleSort ->
+        { model with Sort = not model.Sort }, Cmd.none
+
     | AddNewTodo description ->
         let todo = Todo.New(description)
         { model with Todos = todo::model.Todos ; Edit = None }, Cmd.none
@@ -34,24 +40,54 @@ let update msg model =
             if t1.Id = t2.Id then t1 else t2)
         { model with Todos = todos; Edit = None }, Cmd.none
 
-let view model dispatch =
+[<LitElement("todo-app")>]
+let TodoApp() =
+    let _, props = LitElement.init(fun cfg ->
+        // We need a LitElement to use @lit-labs/motion/animate
+        // But we don't use Shadow DOM so we can use global CSS rules
+        cfg.useShadowDom <- false
+        cfg.props <-
+            {|
+                localStorage = Prop.Of(false, attribute="local-storage")
+            |}
+    )
+
+    Hook.useHmr(hmr)
+
+    let encode, decode =
+        Hook.useMemo(generateThothCoders)
+
+    let model, dispatch =
+        Hook.useElmishWithLocalStorage(
+            init, update,
+            encode, decode, "todo-app",
+            disableStorage = not props.localStorage.Value)
+
+    let todos =
+        if not model.Sort then model.Todos
+        else model.Todos |> List.sortBy (fun t -> t.Description.ToLower())
+
     html $"""
       <div style="margin: 0 auto; max-width: 800px; padding: 20px;">
-        <p class="title">Lit.TodoMVC</p>
+        <div class="title">
+            <slot name="title"></slot>
+        </div>
+
         {NewTodoEl dispatch}
-        <!-- {model.Todos |> List.map (TodoEl dispatch model.Edit)} -->
-        {model.Todos |> Lit.mapUnique
-                (fun t -> string t.Id)
-                (TodoEl dispatch model.Edit)}
+
+        <label class="checkbox">
+          <input type="checkbox"
+            ?checked={model.Sort}
+            @change={Ev(fun _ -> dispatch ToggleSort)}>
+          Sort by description
+        </label>
+
+        {todos |> Lit.mapUnique
+            (fun t -> string t.Id)
+            (TodoEl dispatch model.Edit)}
       </div>
     """
 
-#if !TEST
-open Lit.Elmish
-open Lit.Elmish.HMR
-
-Program.mkProgram init update view
-|> Program.withLocalStorage
-|> Program.withLit "app-container"
-|> Program.run
-#endif
+// Dummy trigger so the module can be imported if not loaded directly from a <script> tag
+// (e.g. from the tests) and the component registered
+let register() = ()
