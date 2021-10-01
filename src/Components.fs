@@ -39,14 +39,15 @@ let NewTodoEl dispatch =
     html $"""
         <div class="field has-addons">
             <div class="control is-expanded">
-                <input {Lit.ref inputRef}
+                <input class="input is-medium"
                     type="text"
-                    class="input is-medium"
                     aria-label="New todo description"
+                    {Lit.ref inputRef}
                     @keyup={Ev(onEnterOrEscape addNewTodo ignore)}>
             </div>
             <div class="control">
-                <button class="button is-primary is-medium" aria-label="Add new todo"
+                <button class="button is-primary is-medium"
+                    aria-label="Add new todo"
                     @click={Ev addNewTodo}>
                     <i role="img" class="bi-plus-lg"></i>
                 </button>
@@ -105,10 +106,10 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
         html $"""
             <div class="columns" style={style}>
                 <div class="column is-10">
-                    <input {Lit.ref inputRef}
+                    <input class="input"
                         type="text"
-                        class="input"
                         aria-label="Edit todo"
+                        {Lit.ref inputRef}
                         value={todo.Description}
                         @keyup={Ev(onEnterOrEscape applyEdit cancelEdit)}
                         @blur={Ev cancelEdit}>
