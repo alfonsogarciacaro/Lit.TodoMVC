@@ -4,7 +4,7 @@ open Fable.Core
 open Browser
 open Elmish
 
-module Util =
+module StorageUtil =
     let mapInit decode storageKey (init: unit -> 'model * Cmd<'msg>) =
         fun () ->
             let defaultModel, cmd = init()
@@ -24,20 +24,23 @@ module Util =
             localStorage.setItem(storageKey, encode newModel)
             newModel, cmd
 
-open Util
+open StorageUtil
 
 module Program =
-    /// Load/save Elmish state to browser's localStorage. Uses Thoth.Json for serialization.
+    /// Load/save Elmish state to browser's localStorage.
     ///
     /// Better used in apps that don't update the Elmish model on every key stroke to prevent hitting localStorage too many times.
     let withLocalStorage (encode: 'model -> string) (decode: string -> 'model) (storageKey: string) (program: Program<unit, 'model, 'msg, 'view>) =
         Program.map (mapInit decode storageKey) (mapUpdate encode storageKey) id id id program
 
 type Lit.Hook with
-    static member inline useElmishWithLocalStorage(init, update, encode, decode, storageKey, ?disable) =
-        let disable = defaultArg disable false
+    /// Load/save Elmish state to browser's localStorage.
+    ///
+    /// Better used in apps that don't update the Elmish model on every key stroke to prevent hitting localStorage too many times.
+    static member inline useElmishWithLocalStorage(init, update, encode, decode, storageKey, ?disableStorage) =
+        let disableStorage = defaultArg disableStorage false
         let init, update =
-            if disable then init, update
+            if disableStorage then init, update
             else mapInit decode storageKey init, mapUpdate encode storageKey update
         Lit.Hook.getContext().useElmish(init, update)
 

@@ -9,7 +9,10 @@ open Lit.TodoMVC
 App.register()
 
 describe "Todo" <| fun () ->
+    // Test the Elmish app without UI
     it "TodoApp Elmish" <| fun () -> promise {
+        // Start the Elmish app without UI and get a handler
+        // to access the model and dispatch messages
         use app =
             Program.mkHidden App.init App.update
             |> Program.runTest
@@ -20,6 +23,7 @@ describe "Todo" <| fun () ->
         |> Expect.isFalse "completed" (fun t -> t.Completed)
     }
 
+    // Test the UI (running Elmish underneath)
     it "TodoApp UI" <| fun () -> promise {
         use! container = render_html $"<todo-app></todo-app>"
 

@@ -48,7 +48,7 @@ let NewTodoEl dispatch =
             <div class="control">
                 <button class="button is-primary is-medium" aria-label="Add new todo"
                     @click={Ev addNewTodo}>
-                    <i role"img" class="bi-plus-lg"></i>
+                    <i role="img" class="bi-plus-lg"></i>
                 </button>
             </div>
         </div>
@@ -74,10 +74,16 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
     let transition =
         Hook.useTransition(
             ms = 500,
-            cssBefore = "opacity: 0; transform: scale(2);",
-            cssAfter = "opacity: 0; transform: scale(0.1);",
-            onComplete = fun isIn -> if not isIn then DeleteTodo todo.Id |> dispatch
-        )
+            onComplete = (fun isIn ->
+                if not isIn then DeleteTodo todo.Id |> dispatch),
+            cssBefore = inline_css """.{
+                opacity: 0;
+                transform: scale(2);
+            }""",
+            cssAfter = inline_css """.{
+                opacity: 0;
+                transform: scale(0.1);
+            }""")
 
     let style = transition.css + inline_css """.{
         border: 2px solid lightgray;
@@ -110,7 +116,7 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
                 <div class="column is-2">
                     <button class="button is-primary" aria-label="Save edit"
                         @click={Ev applyEdit}>
-                        <i role"img" class="bi-save"></i>
+                        <i role="img" class="bi-save"></i>
                     </button>
                 </div>
             </div>"""
@@ -125,19 +131,18 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
                     </p>
                 </div>
                 <div class="column is-3">
-                    <!-- TODO: Provide aria besides color to indicate if item is complete or not -->
                     <button class={Lit.classes ["button", true; "is-success", todo.Completed]}
                         aria-label={if todo.Completed then "Mark uncompleted" else "Mark completed"}
                         @click={Ev(fun _ -> ToggleCompleted todo.Id |> dispatch)}>
-                        <i role"img" class="bi-check-lg"></i>
+                        <i role="img" class="bi-check-lg"></i>
                     </button>
                     <button class="button is-primary" aria-label="Edit"
                         @click={Ev(fun _ -> StartEdit todo |> dispatch)}>
-                        <i role"img" class="bi-pencil"></i>
+                        <i role="img" class="bi-pencil"></i>
                     </button>
                     <button class="button is-danger" aria-label="Delete"
                         @click={Ev(fun _ -> transition.triggerLeave())}>
-                        <i role"img" class="bi-trash"></i>
+                        <i role="img" class="bi-trash"></i>
                     </button>
                 </div>
             </div>

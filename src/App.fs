@@ -43,6 +43,8 @@ let update msg model =
 [<LitElement("todo-app")>]
 let TodoApp() =
     let _, props = LitElement.init(fun cfg ->
+        // We need a LitElement to use @lit-labs/motion/animate
+        // But we don't use Shadow DOM so we can use global CSS rules
         cfg.useShadowDom <- false
         cfg.props <-
             {|
@@ -51,8 +53,15 @@ let TodoApp() =
     )
 
     Hook.useHmr(hmr)
-    let encode, decode = Hook.useMemo(generateThothCoders)
-    let model, dispatch = Hook.useElmishWithLocalStorage(init, update, encode, decode, "todo-app", disable = not props.localStorage.Value)
+
+    let encode, decode =
+        Hook.useMemo(generateThothCoders)
+
+    let model, dispatch =
+        Hook.useElmishWithLocalStorage(
+            init, update,
+            encode, decode, "todo-app",
+            disableStorage = not props.localStorage.Value)
 
     let todos =
         if not model.Sort then model.Todos
@@ -79,5 +88,6 @@ let TodoApp() =
       </div>
     """
 
-// Dummy trigger so the module can be imported and the component registered
+// Dummy trigger so the module can be imported if not loaded directly from a <script> tag
+// (e.g. from the tests) and the component registered
 let register() = ()

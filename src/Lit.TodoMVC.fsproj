@@ -9,8 +9,8 @@
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fable.Lit" Version="1.1.0-beta-002" />
-    <PackageReference Include="Fable.Lit.Elmish" Version="1.0.0" />
+    <PackageReference Include="Fable.Lit" Version="1.1.0" />
+    <PackageReference Include="Fable.Elmish" Version="3.1.0" />
     <PackageReference Include="Thoth.Json" Version="6.0.0" />
   </ItemGroup>
 </Project>
