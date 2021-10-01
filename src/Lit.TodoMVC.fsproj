@@ -4,8 +4,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Util.fs" />
-    <Compile Include="Types.fs" />
-    <Compile Include="Components.fs" />
+    <Compile Include="Todos.fs" />
+    <Compile Include="Virtualizer.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
