@@ -9,6 +9,7 @@
     <ProjectReference Include="..\src\Lit.TodoMVC.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fable.Lit.Test" Version="1.1.0" />
+    <PackageReference Include="Fable.Lit.Test" Version="1.2.0" />
+    <PackageReference Include="Fable.Lit.Elmish" Version="1.2.0" />
   </ItemGroup>
 </Project>

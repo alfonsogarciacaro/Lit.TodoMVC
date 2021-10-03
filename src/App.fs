@@ -1,11 +1,6 @@
 module Lit.TodoMVC.App
 
-open Elmish
 open Lit
-open Util
-
-Todos.register()
-Virtualizer.register()
 
 [<RequireQualifiedAccess>]
 type Tab =
@@ -32,11 +27,15 @@ let MyApp() =
 
     let content =
         match activeTab with
-        | Tab.Todos -> html $"""<todo-app local-storage></todo-app>"""
-        | Tab.Virtualizer -> html $"""<virtualizer-app></virtualizer-app>"""
+        | Tab.Todos ->
+            Lit.ofImport(Todos.register, fun _ ->
+                html $"""<todo-app local-storage></todo-app>""")
+        | Tab.Virtualizer ->
+            Lit.ofImport(Virtualizer.register, fun _ ->
+                html $"""<contact-list></contact-list>""")
 
     html $"""
-        <div class="tabs">
+        <div class="tabs" style="margin-bottom: 0.5rem;">
           <ul>
             {renderTab Tab.Todos "Todos"}
             {renderTab Tab.Virtualizer "Virtual Scroll"}

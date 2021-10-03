@@ -90,7 +90,7 @@ let NewTodoEl dispatch =
                 <input class="input is-medium"
                     type="text"
                     aria-label="New todo description"
-                    {Lit.ref inputRef}
+                    {Lit.refValue inputRef}
                     @keyup={Ev(onEnterOrEscape addNewTodo ignore)}>
             </div>
             <div class="control">
@@ -157,7 +157,7 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
                     <input class="input"
                         type="text"
                         aria-label="Edit todo"
-                        {Lit.ref inputRef}
+                        {Lit.refValue inputRef}
                         value={todo.Description}
                         @keyup={Ev(onEnterOrEscape applyEdit cancelEdit)}
                         @blur={Ev cancelEdit}>
@@ -171,7 +171,7 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
             </div>"""
     else
         html $"""
-            <div {LitLabs.animate()} class="columns" style={style}>
+            <div {LitLabs.motion.animate()} class="columns" style={style}>
                 <div class="column is-9">
                     <p class="subtitle"
                         style="cursor: pointer; user-select: none"
