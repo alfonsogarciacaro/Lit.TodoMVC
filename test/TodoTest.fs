@@ -4,9 +4,11 @@ open Expect
 open Expect.Dom
 open Expect.Elmish
 open WebTestRunner
+open Lit.Elmish
 open Lit.TodoMVC
+open Lit.TodoMVC.Todos.Elmish
 
-App.register()
+Todos.register()
 
 describe "Todo" <| fun () ->
     // Test the Elmish app without UI
@@ -14,8 +16,8 @@ describe "Todo" <| fun () ->
         // Start the Elmish app without UI and get a handler
         // to access the model and dispatch messages
         use app =
-            Program.mkHidden App.init App.update
-            |> Program.runTest
+            Program.mkHidden init update
+            |> Program.test
 
         AddNewTodo "Elmish test" |> app.Dispatch
         app.Model.Todos

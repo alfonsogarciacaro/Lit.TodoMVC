@@ -4,13 +4,45 @@ open Fable.Core
 open Browser
 open Browser.Types
 open Elmish
+open Lit
 
-type LitLabs =
-    [<ImportMember("@lit-labs/motion")>]
-    static member animate(): unit = jsNative
+module LitLabs =
+    type ScrollLayout =
+        interface end
 
-    [<ImportMember("@lit-labs/virtualizer")>]
-    static member scroll(): unit = jsNative
+    [<StringEnum; RequireQualifiedAccess>]
+    type ScrollToPosition =
+        | Start
+        | Center
+        | End
+        | Nearest
+
+    [<AttachMembers>]
+    type ScrollToIndex(index: int, ?position: ScrollToPosition) =
+        member _.index = index
+        member _.position = defaultArg position ScrollToPosition.Start
+
+    type Motion =
+        abstract animate: unit -> unit
+
+    [<ImportAll("@lit-labs/motion")>]
+    let motion: Motion = jsNative
+
+    type Virtualizer =
+        abstract Layout1d: ScrollLayout
+        abstract Layout1dGrid: ScrollLayout
+        [<ParamObject>]
+        abstract scroll:
+            items: 'T array *
+            renderItem: ('T -> int -> TemplateResult) *
+            layout: ScrollLayout *
+            ?keyFunction: ('T -> string) *
+            ?scrollTarget: Element *
+            ?totalItems: int *
+            ?scrollToIndex: ScrollToIndex -> unit
+
+    [<ImportAll("@lit-labs/virtualizer")>]
+    let virtualizer: Virtualizer = jsNative
 
 module Storage =
     let mapInit decode storageKey (init: unit -> 'model * Cmd<'msg>) =
@@ -39,7 +71,7 @@ module Program =
     let withLocalStorage (encode: 'model -> string) (decode: string -> 'model) (storageKey: string) (program: Program<unit, 'model, 'msg, 'view>) =
         Program.map (Storage.mapInit decode storageKey) (Storage.mapUpdate encode storageKey) id id id program
 
-type Lit.Hook with
+type Hook with
     /// Load/save Elmish state to browser's localStorage.
     ///
     /// Better used in apps that don't update the Elmish model on every key stroke to prevent hitting localStorage too many times.
@@ -48,7 +80,7 @@ type Lit.Hook with
         let init, update =
             if disableStorage then init, update
             else Storage.mapInit decode storageKey init, Storage.mapUpdate encode storageKey update
-        Lit.Hook.getContext().useElmish(init, update)
+        Hook.getContext().useElmish(init, update)
 
 let inline generateThothCoders<'T>() =
     let encoder =
@@ -66,6 +98,9 @@ let onEnterOrEscape onEnter onEscape (ev: Event) =
     | "Enter" -> onEnter ev
     | "Escape" -> onEscape ev
     | _ -> ()
+
+[<Emit("fetch($0).then(x => x.json())")>]
+let fetchJson<'T> (url: string): JS.Promise<'T> = jsNative
 
 type Option<'T> with
     member this.Iter(f) =

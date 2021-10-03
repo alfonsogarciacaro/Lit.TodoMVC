@@ -9,7 +9,7 @@ snapshots["new-todo"] =
     </div>
     <div class="field has-addons">
     <div class="control is-expanded">
-    <input type="text" class="input is-medium" aria-label="New todo description">
+    <input class="input is-medium" type="text" aria-label="New todo description">
     </div>
     <div class="control">
     <button class="button is-primary is-medium" aria-label="Add new todo">
