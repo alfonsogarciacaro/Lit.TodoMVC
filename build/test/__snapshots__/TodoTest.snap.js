@@ -21,9 +21,7 @@ snapshots["new-todo"] =
     <input type="checkbox">
     Sort by description
     </label>
-        <div class="columns" style="transition-duration: 500ms;
-                opacity: 0;
-                transform: scale(2);
+        <div class="columns" style="transition-duration: 500ms;  opacity: 0; transform: scale(2);
         border: 2px solid lightgray;
         border-radius: 10px;
         margin: 5px 0;
@@ -45,9 +43,7 @@ snapshots["new-todo"] =
         </button>
         </div>
         </div>
-        <div class="columns" style="transition-duration: 500ms;
-                opacity: 0;
-                transform: scale(2);
+        <div class="columns" style="transition-duration: 500ms;  opacity: 0; transform: scale(2);
         border: 2px solid lightgray;
         border-radius: 10px;
         margin: 5px 0;
@@ -69,9 +65,7 @@ snapshots["new-todo"] =
         </button>
         </div>
         </div>
-        <div class="columns" style="transition-duration: 500ms;
-                opacity: 0;
-                transform: scale(2);
+        <div class="columns" style="transition-duration: 500ms;  opacity: 0; transform: scale(2);
         border: 2px solid lightgray;
         border-radius: 10px;
         margin: 5px 0;

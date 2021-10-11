@@ -123,16 +123,10 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
     let transition =
         Hook.useTransition(
             ms = 500,
+            cssBefore = inline_css ".{ opacity: 0; transform: scale(2); }",
+            cssAfter = inline_css ".{ opacity: 0; transform: scale(0.1); }",
             onComplete = (fun isIn ->
-                if not isIn then DeleteTodo todo.Id |> dispatch),
-            cssBefore = inline_css """.{
-                opacity: 0;
-                transform: scale(2);
-            }""",
-            cssAfter = inline_css """.{
-                opacity: 0;
-                transform: scale(0.1);
-            }""")
+                if not isIn then DeleteTodo todo.Id |> dispatch))
 
     let style = transition.css + inline_css """.{
         border: 2px solid lightgray;
