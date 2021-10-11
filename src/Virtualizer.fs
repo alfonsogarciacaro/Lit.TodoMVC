@@ -41,16 +41,14 @@ let ContactCard() =
     match props.contact.Value with
     | None -> Lit.nothing
     | Some contact ->
-        let summaryStyle =
-            if isOpen then "display: block"
-            else "display: none"
-
         html $"""
             <details style="background: {contact.color}">
                 <summary @click={Ev(fun _ -> setOpen(not isOpen))}>
                     {contact.name}
                 </summary>
-                <p style={summaryStyle}>{contact.mediumText}</p>
+                <p style="display: {if isOpen then "block" else "none"};">
+                    {contact.mediumText}
+                </p>
             </details>
     """
 
@@ -78,7 +76,7 @@ let ContactList() =
     )
 
     let renderContact (contact: Contact) _ =
-        html $"""<contact-card .contact={contact}></contact-card>"""
+        html $"<contact-card .contact={contact}></contact-card>"
 
     html $"""
         <div class="contact-list">
