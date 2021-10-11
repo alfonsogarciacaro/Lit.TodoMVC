@@ -84,6 +84,16 @@ let NewTodoEl dispatch =
             | "" -> ()
             | v -> v |> AddNewTodo |> dispatch
 
+    let dummyString = "foobar"
+    let dummyEmptyString = """
+
+    foobar
+
+    """
+    let dummyTemplateSingleEmpty = html $""
+    let dummyTemplateSingle = html $"<span></span>"
+    let dummyTemplateSingleWithHoles = html $"<span>{dummyString.Substring(2, 4)}</span>"
+    let dummyTemplateTripleEmpty = html $""""""
     html $"""
         <div class="field has-addons">
             <div class="control is-expanded">
