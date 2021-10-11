@@ -4,6 +4,7 @@ open Expect
 open Expect.Dom
 open Expect.Elmish
 open WebTestRunner
+open Lit.Test
 open Lit.Elmish
 open Lit.TodoMVC
 open Lit.TodoMVC.Todos.Elmish

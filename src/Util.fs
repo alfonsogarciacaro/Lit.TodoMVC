@@ -5,6 +5,7 @@ open Browser
 open Browser.Types
 open Elmish
 open Lit
+open Lit.Elmish
 
 module LitLabs =
     type ScrollLayout =
@@ -80,7 +81,7 @@ type Hook with
         let init, update =
             if disableStorage then init, update
             else Storage.mapInit decode storageKey init, Storage.mapUpdate encode storageKey update
-        Hook.getContext().useElmish(init, update)
+        Hook.useElmish(init, update)
 
 let inline generateThothCoders<'T>() =
     let encoder =
