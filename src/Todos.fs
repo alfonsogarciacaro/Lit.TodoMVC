@@ -106,6 +106,26 @@ let NewTodoEl dispatch =
 [<HookComponent>]
 let TodoEl dispatch (edit: Todo option) (todo: Todo) =
     Hook.useHmr(hmr)
+    let transitionMs = 500
+    let className = Hook.use_scoped_css $"""
+        :host {{
+            transition-duration: {transitionMs}ms;
+            border: 2px solid lightgray;
+            border-radius: 10px;
+            margin: 5px 0;
+        }}
+        :host.transition-enter {{
+            opacity: 0;
+            transform: scale(2);
+        }}
+        :host.transition-leave {{
+            opacity: 0;
+            transform: scale(0.1);
+        }}
+        .is-clickable {{
+            user-select: none;
+        }}
+    """
 
     let isEditing =
         match edit with
@@ -120,106 +140,95 @@ let TodoEl dispatch (edit: Todo option) (todo: Todo) =
             inputRef.Value.Iter(fun i -> i.select())
         | _ -> ())
 
-    let transition =
-        Hook.useTransition(
-            ms = 500,
-            cssBefore = inline_css ".{ opacity: 0; transform: scale(2); }",
-            cssAfter = inline_css ".{ opacity: 0; transform: scale(0.1); }",
-            onComplete = (fun isIn ->
-                if not isIn then DeleteTodo todo.Id |> dispatch))
+    let transition = Hook.useTransition(transitionMs, onLeft = (fun () -> DeleteTodo todo.Id |> dispatch))
 
-    let style = transition.css + inline_css """.{
-        border: 2px solid lightgray;
-        border-radius: 10px;
-        margin: 5px 0;
-    }"""
+    let inner =
+        if isEditing then
+            let applyEdit _ =
+                inputRef.Value.Iter(fun input ->
+                    { todo with Description = input.value.Trim() }
+                    |> Some
+                    |> FinishEdit
+                    |> dispatch)
 
-    if isEditing then
-        let applyEdit _ =
-            inputRef.Value.Iter(fun input ->
-                { todo with Description = input.value.Trim() }
-                |> Some
-                |> FinishEdit
-                |> dispatch)
+            let cancelEdit _ =
+                FinishEdit None |> dispatch
 
-        let cancelEdit _ =
-            FinishEdit None |> dispatch
-
-        html $"""
-            <div class="columns" style={style}>
-                <div class="column is-10">
-                    <input class="input"
-                        type="text"
-                        aria-label="Edit todo"
-                        {Lit.refValue inputRef}
-                        value={todo.Description}
-                        @keyup={Ev(onEnterOrEscape applyEdit cancelEdit)}
-                        @blur={Ev cancelEdit}>
-                </div>
-                <div class="column is-2">
-                    <button class="button is-primary" aria-label="Save edit"
-                        @click={Ev applyEdit}>
-                        <i role="img" class="bi-save"></i>
-                    </button>
-                </div>
-            </div>"""
-    else
-        html $"""
-            <div {LitLabs.motion.animate()} class="columns" style={style}>
-                <div class="column is-9">
-                    <p class="subtitle"
-                        style="cursor: pointer; user-select: none"
-                        @dblclick={Ev(fun _ -> StartEdit todo |> dispatch)}>
-                        {todo.Description}
-                    </p>
-                </div>
-                <div class="column is-3">
-                    <button class={Lit.classes ["button", true; "is-success", todo.Completed]}
-                        aria-label={if todo.Completed then "Mark uncompleted" else "Mark completed"}
-                        @click={Ev(fun _ -> ToggleCompleted todo.Id |> dispatch)}>
-                        <i role="img" class="bi-check-lg"></i>
-                    </button>
-                    <button class="button is-primary" aria-label="Edit"
-                        @click={Ev(fun _ -> StartEdit todo |> dispatch)}>
-                        <i role="img" class="bi-pencil"></i>
-                    </button>
-                    <button class="button is-danger" aria-label="Delete"
-                        @click={Ev(fun _ -> transition.triggerLeave())}>
-                        <i role="img" class="bi-trash"></i>
-                    </button>
-                </div>
+            html $"""
+            <div class="column is-10">
+                <input class="input"
+                    type="text"
+                    aria-label="Edit todo"
+                    {Lit.refValue inputRef}
+                    value={todo.Description}
+                    @keyup={Ev(onEnterOrEscape applyEdit cancelEdit)}
+                    @blur={Ev cancelEdit}>
             </div>
-        """
+            <div class="column is-2">
+                <button class="button is-primary" aria-label="Save edit"
+                    @click={Ev applyEdit}>
+                    <i role="img" class="bi-save"></i>
+                </button>
+            </div>
+            """
+        else
+            html $"""
+            <div class="column is-9">
+                <p class="subtitle is-clickable"
+                    @dblclick={Ev(fun _ -> StartEdit todo |> dispatch)}>
+                    {todo.Description}
+                </p>
+            </div>
+            <div class="column is-3">
+                <button class={Lit.classes ["button", true; "is-success", todo.Completed]}
+                    aria-label={if todo.Completed then "Mark uncompleted" else "Mark completed"}
+                    @click={Ev(fun _ -> ToggleCompleted todo.Id |> dispatch)}>
+                    <i role="img" class="bi-check-lg"></i>
+                </button>
+                <button class="button is-primary" aria-label="Edit"
+                    @click={Ev(fun _ -> StartEdit todo |> dispatch)}>
+                    <i role="img" class="bi-pencil"></i>
+                </button>
+                <button class="button is-danger" aria-label="Delete"
+                    @click={Ev(fun _ -> transition.triggerLeave())}>
+                    <i role="img" class="bi-trash"></i>
+                </button>
+            </div>
+            """
+
+    html $"""<div class="columns {className} {transition.className}" {LitLabs.motion.animate()}>{inner}</div>"""
 
 [<LitElement("todo-app")>]
 let TodoApp() =
+    Hook.useHmr(hmr)
     let _, props = LitElement.init(fun cfg ->
         // We need a LitElement to use @lit-labs/motion/animate
         // But we don't use Shadow DOM so we can use global CSS rules
         cfg.useShadowDom <- false
         cfg.props <-
             {|
-                localStorage = Prop.Of(false, attribute="local-storage")
+                localStorage = Prop.Of(None, attribute="local-storage")
             |}
     )
 
-    Hook.useHmr(hmr)
-
-    let encode, decode =
-        Hook.useMemo(generateThothCoders)
+    // Scoped CSS can be used together with global rules (like Bulma, Bootstrap, etc)
+    let className = Hook.use_scoped_css """
+        :host {
+            margin: 0 auto;
+            max-width: 800px;
+            padding: 20px;
+        }
+    """
 
     let model, dispatch =
-        Hook.useElmishWithLocalStorage(
-            init, update,
-            encode, decode, "todo-app",
-            disableStorage = not props.localStorage.Value)
+        Hook.useElmishWithLocalStorage(init, update, ?storageKey=props.localStorage.Value)
 
     let todos =
         if not model.Sort then model.Todos
         else model.Todos |> List.sortBy (fun t -> t.Description.ToLower())
 
     html $"""
-      <div style="margin: 0 auto; max-width: 800px; padding: 20px;">
+    <div class={className}>
         <div class="title">
             <slot name="title"></slot>
         </div>
@@ -227,14 +236,14 @@ let TodoApp() =
         {NewTodoEl dispatch}
 
         <label class="checkbox">
-          <input type="checkbox"
-            ?checked={model.Sort}
-            @change={Ev(fun _ -> dispatch ToggleSort)}>
-          Sort by description
+            <input type="checkbox"
+                ?checked={model.Sort}
+                @change={Ev(fun _ -> dispatch ToggleSort)}>
+            Sort by description
         </label>
 
         {todos |> Lit.mapUnique
             (fun t -> string t.Id)
             (TodoEl dispatch model.Edit)}
-      </div>
+    </div>
     """

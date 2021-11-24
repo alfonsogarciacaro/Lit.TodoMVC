@@ -29,7 +29,7 @@ let MyApp() =
         match activeTab with
         | Tab.Todos ->
             Lit.ofImport(Todos.register, fun _ ->
-                html $"<todo-app local-storage></todo-app>")
+                html $"""<todo-app local-storage="todo-app"></todo-app>""")
         | Tab.Virtualizer ->
             Lit.ofImport(Virtualizer.register, fun _ ->
                 html $"<contact-list></contact-list>")

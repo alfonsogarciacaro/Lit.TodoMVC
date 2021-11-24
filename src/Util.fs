@@ -65,33 +65,39 @@ module Storage =
             localStorage.setItem(storageKey, encode newModel)
             newModel, cmd
 
+    let inline generateCoders<'T>() =
+        let encoder =
+            let enc = Thoth.Json.Encode.Auto.generateEncoder<'T>()
+            fun model -> enc model |> Thoth.Json.Encode.toString 0
+
+        let decoder =
+            let dec = Thoth.Json.Decode.Auto.generateDecoder<'T>()
+            fun json -> Thoth.Json.Decode.unsafeFromString dec json
+
+        encoder, decoder
+
 module Program =
     /// Load/save Elmish state to browser's localStorage.
     ///
     /// Better used in apps that don't update the Elmish model on every key stroke to prevent hitting localStorage too many times.
-    let withLocalStorage (encode: 'model -> string) (decode: string -> 'model) (storageKey: string) (program: Program<unit, 'model, 'msg, 'view>) =
-        Program.map (Storage.mapInit decode storageKey) (Storage.mapUpdate encode storageKey) id id id program
+    let inline withLocalStorage (storageKey: string) (program: Program<unit, 'model, 'msg, 'view>) =
+        let encoder, decoder = Storage.generateCoders()
+        Program.map (Storage.mapInit decoder storageKey) (Storage.mapUpdate encoder storageKey) id id id program
 
 type Hook with
     /// Load/save Elmish state to browser's localStorage.
     ///
     /// Better used in apps that don't update the Elmish model on every key stroke to prevent hitting localStorage too many times.
-    static member inline useElmishWithLocalStorage(init, update, encode, decode, storageKey, ?disableStorage) =
-        let disableStorage = defaultArg disableStorage false
+    static member inline useElmishWithLocalStorage(init, update, ?storageKey: string) =
         let init, update =
-            if disableStorage then init, update
-            else Storage.mapInit decode storageKey init, Storage.mapUpdate encode storageKey update
+            match storageKey with
+            | Some storageKey when not(System.String.IsNullOrWhiteSpace(storageKey)) ->
+                let storageKey = storageKey.Trim()
+                let encoder, decoder = Storage.generateCoders()
+                Storage.mapInit decoder storageKey init, Storage.mapUpdate encoder storageKey update
+            | _ ->
+                init, update
         Hook.useElmish(init, update)
-
-let inline generateThothCoders<'T>() =
-    let encoder =
-        let enc = Thoth.Json.Encode.Auto.generateEncoder<'T>()
-        fun model -> enc model |> Thoth.Json.Encode.toString 0
-
-    let decoder =
-        let dec = Thoth.Json.Decode.Auto.generateDecoder<'T>()
-        fun json -> Thoth.Json.Decode.unsafeFromString dec json
-    encoder, decoder
 
 let onEnterOrEscape onEnter onEscape (ev: Event) =
     let ev = ev :?> KeyboardEvent

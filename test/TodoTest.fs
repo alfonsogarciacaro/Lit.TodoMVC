@@ -42,5 +42,4 @@ describe "Todo" <| fun () ->
         do! elementUpdated el
 
         el |> Expect.success "new todo found" (fun el -> el.getByText(newTodo))
-        do! el |> Expect.matchHtmlSnapshot "new-todo"
     }

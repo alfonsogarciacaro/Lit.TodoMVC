@@ -14,6 +14,7 @@ type Contact =
 
 [<LitElement("contact-card")>]
 let ContactCard() =
+    Hook.useHmr(hmr)
     let _, props = LitElement.init(fun cfg ->
         cfg.styles <- [
             css $"""
@@ -36,7 +37,6 @@ let ContactCard() =
             |}
     )
 
-    Hook.useHmr(hmr)
     let isOpen, setOpen = Hook.useState(false)
     match props.contact.Value with
     | None -> Lit.nothing
@@ -54,6 +54,7 @@ let ContactCard() =
 
 [<LitElement("contact-list")>]
 let ContactList() =
+    Hook.useHmr(hmr)
     let _ = LitElement.init(fun cfg ->
         cfg.styles <- [
             css $"""
@@ -68,7 +69,6 @@ let ContactList() =
         ]
     )
 
-    Hook.useHmr(hmr)
     let contacts, setContacts = Hook.useState([||])
     Hook.useEffectOnce(fun () ->
         fetchJson<Contact array>("contacts.json")
